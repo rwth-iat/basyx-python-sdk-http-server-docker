@@ -1,0 +1,75 @@
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.31-latest
+    container_name: Envoy
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+      - ./hmac-secret.yaml:/etc/envoy/hmac-secret.yaml
+      - ./token-secret.yaml:/etc/envoy/token-secret.yaml
+    ports:
+      - "10000:10000"
+      - "8001:8001"
+    command: ["envoy", "-c", "/etc/envoy/envoy.yaml", "--component-log-level", "ext_authz:trace"]
+    depends_on:
+      - keycloak
+  
+  postgres:
+    image: postgres:latest
+    container_name: PostgreSQL
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: Keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin 
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Keycloak/realm.json:/opt/keycloak/data/import/realm.json 
+    depends_on:
+      - postgres
+
+  opa-envoy:
+    image: openpolicyagent/opa:latest-envoy
+    container_name: opa-envoy 
+    ports:
+      - "9191:9191"
+    command:
+      - run
+      - --server
+      - --log-level=debug
+      - --config-file=/opa.yaml
+      - /policies
+    volumes:
+      - ./policies:/policies
+      - ./opa.yaml:/opa.yaml
+
+  basyxserver:
+    build:
+      context: ./basyx-python-sdk-http-server-docker
+      dockerfile: Dockerfile
+    container_name: basyx-python-sdk-http-server
+    ports:
+      - "8282:80"
+    volumes:
+      - ./basyx-python-sdk-http-server-docker/storage:/storage
+
+          
+
+
+
