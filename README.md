@@ -1,54 +1,48 @@
-# Eclipse BaSyx Python SDK - HTTP Server
+# Security for the Eclipse BaSyx Python SDK - HTTP Server
 
-This repository contains a Dockerfile to spin up an exemplary HTTP/REST server following the [Specification of the AAS Part 2 API][6] with ease.
-The server currently implements the following interfaces:
+This branch adds access control features to the BaSyx server using Open Policy Agent (OPA), Envoy Proxy and Keycloak. The setup ensures that all incoming requests are authenticated through Keycloak and authorized based on policies defined in OPA.
 
-- [Asset Administration Shell Repository Service][4]
-- [Submodel Repository Service][5]
 
-It uses the [HTTP API][1] and the [AASX Adapter][7] of the [BaSyx Python SDK][3], to serve AASX files from a given directory.
-The AASX files are only read, chages won't persist.
+## Overview
+This setup uses:
+1. **Keycloak** for user authentication.
+2. **Open Policy Agent (OPA)** for access control.
+3. **Envoy Proxy** to act as an intermediary, enforcing authentication and authorization.
 
-Alternatively, the container can also be told to use the [Local-File Backend][2] instead, which stores AAS and Submodels as individual JSON files and allows for persistent changes (except supplementary files, i.e. files referenced by `File` submodel elements).
-See [below](#options) on how to configure this.
+## Why Use Envoy?
+Envoy is especially suitable when you want to implement security without modifying your existing application. It acts as a sidecar proxy that can handle authentication, authorization and other features.
 
-## Building
-The container image can be built via:
+## Workflow
+![img.png](img.png)
+
+## How to use?
+Clone this repository. Ensure you are in the root directory of the cloned repository, then run:
 ```
-$ docker buildx build -t basyx-python-sdk-http-server .
+docker-compose up --build -d
 ```
-
-## Running
-Because the server uses the [Local-File Backend][2], the container needs to be provided with the directory `/storage` to store AAS and Submodel JSON files.
-This directory can be mapped via the `-v` option from another image or a local directory.
-To map the directory `storage` inside the container, `-v ./storage:/storage` can be used.
-The directory `storage` will be created in the current working directory, if it doesn't already exist.
-
-The HTTP server inside the container listens on port 80 by default.
-To expose it on the host on port 8080, use the option `-p 8080:80` when running it.
-
-Putting it all together, the container can be started via the following command:
+Furthermore, you need to add client authentication with Keycloak in your client code. If you are using our our [aas-python-http-client](https://github.com/rwth-iat/aas-python-http-client) , just add these lines to your main.py file:
 ```
-$ docker run -p 8080:80 -v ./storage:/storage basyx-python-sdk-http-server
-```
+import requests
 
-Since Windows uses backslashes instead of forward slashes in paths, you'll have to adjust the path to the storage directory there:
-```
-> docker run -p 8080:80 -v .\storage:/storage basyx-python-sdk-http-server
-```
+# Step 1: Get an access token from Keycloak
+keycloak_url = "http://localhost:8080/realms/myBasyxServer/protocol/openid-connect/token"
+client_id = "myBasyxClient"
+client_secret = "0MSF64IzBhJ7Rn0pjOdafqVIB8udEQWq"
+username = "aa"
+password = "aa"
 
-## Options
-The container can be configured via environment variables:
-- `API_BASE_PATH` determines the base path under which all other API paths are made available. Default: `/api/v3.0`
-- `STORAGE_TYPE` can be one of `AASX` or `LOCAL_FILE`:
-  - When set to `AASX` (the default), the server will read and serve AASX files from the storage directory. The AASX files are not modified, all changes done via the API are only stored in memory.
-  - When instead set to `LOCAL_FILE`, the server makes use of the [LocalFileBackend][2], where AAS and Submodels are persistently stored as JSON files. Supplementary files, i.e. files referenced by `File` submodel elements, are not stored in this case.
-- `STORAGE_PATH` sets the directory to read the files from *within the container*. If you bind your files to a directory different from the default `/storage`, you can use this variable to adjust the server accordingly.
+token_response = requests.post(keycloak_url, data={
+'grant_type': 'password',
+'client_id': client_id,
+'client_secret': client_secret,
+'username': username,
+'password': password
+})
 
-[1]: https://github.com/eclipse-basyx/basyx-python-sdk/pull/238
-[2]: https://basyx-python-sdk.readthedocs.io/en/latest/backend/local_file.html
-[3]: https://github.com/eclipse-basyx/basyx-python-sdk
-[4]: https://app.swaggerhub.com/apis/Plattform_i40/AssetAdministrationShellRepositoryServiceSpecification/V3.0.1_SSP-001
-[5]: https://app.swaggerhub.com/apis/Plattform_i40/SubmodelRepositoryServiceSpecification/V3.0.1_SSP-001
-[6]: https://industrialdigitaltwin.org/content-hub/aasspecifications/idta_01002-3-0_application_programming_interfaces
-[7]: https://basyx-python-sdk.readthedocs.io/en/latest/adapter/aasx.html#adapter-aasx
+if token_response.status_code != 200:
+raise Exception(f"Failed to obtain token: {token_response.text}")
+
+access_token = token_response.json().get('access_token')
+
+api_client.default_headers['Authorization'] = f'Bearer {access_token}'
+```

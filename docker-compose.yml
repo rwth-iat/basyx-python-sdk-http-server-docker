@@ -4,8 +4,6 @@ services:
     container_name: Envoy
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
-      - ./hmac-secret.yaml:/etc/envoy/hmac-secret.yaml
-      - ./token-secret.yaml:/etc/envoy/token-secret.yaml
     ports:
       - "10000:10000"
       - "8001:8001"
@@ -61,13 +59,12 @@ services:
 
   basyxserver:
     build:
-      context: ./basyx-python-sdk-http-server-docker
       dockerfile: Dockerfile
     container_name: basyx-python-sdk-http-server
     ports:
       - "8282:80"
     volumes:
-      - ./basyx-python-sdk-http-server-docker/storage:/storage
+      - ./storage:/storage
 
           
 
