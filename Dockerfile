@@ -8,8 +8,7 @@ ENV NGINX_MAX_UPLOAD 1M
 ENV UWSGI_CHEAPER 0
 ENV UWSGI_PROCESSES 1
 
-COPY app/requirements.txt /app
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir git+https://github.com/rwth-iat/basyx-python-sdk@main
 
 COPY ./app /app
 COPY ./nginx /etc/nginx/conf.d
