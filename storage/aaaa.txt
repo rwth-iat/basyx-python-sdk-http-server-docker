@@ -1,1 +1,1 @@
-docker build -t myserver .
+docker exec -it 7360a184e9ae /bin/sh

@@ -55,8 +55,8 @@ ENTRYPOINT ["/entrypoint.sh"]
 RUN pip install --no-cache-dir git+https://github.com/rwth-iat/basyx-python-sdk@main
 
 COPY ./app /app
-COPY ./nginx/body-buffer-size.conf /etc/nginx/conf.d/body-buffer-size.conf
-COPY ./nginx/cors-header.conf /etc/nginx/conf.d/cors-header.conf
+# COPY ./nginx/body-buffer-size.conf /etc/nginx/conf.d/body-buffer-size.conf
+# COPY ./nginx/cors-header.conf /etc/nginx/conf.d/cors-header.conf
 WORKDIR /app
 
 RUN pip install Werkzeug
