@@ -13,9 +13,9 @@ ENV PYTHONUNBUFFERED=1
 RUN apk update && \
     apk add --no-cache nginx supervisor gcc musl-dev linux-headers python3-dev git bash && \
     pip install uwsgi && \
-    pip install --no-cache-dir git+https://github.com/rwth-iat/basyx-python-sdk@main && \
-    pip install Werkzeug && \
+    pip install --no-cache-dir git+https://github.com/eclipse-basyx/basyx-python-sdk@main && \
     apk del git bash
+
 
 COPY uwsgi.ini /etc/uwsgi/
 COPY supervisord.ini /etc/supervisor/conf.d/supervisord.ini
