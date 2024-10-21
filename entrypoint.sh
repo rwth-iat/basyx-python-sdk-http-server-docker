@@ -14,6 +14,14 @@ NGINX_WORKER_CONNECTIONS=${NGINX_WORKER_CONNECTIONS:-1024}
 # Get the listen port for Nginx, default to 80
 USE_LISTEN_PORT=${LISTEN_PORT:-80}
 
+# Get the client_body_buffer_size for Nginx, default to 1M
+USE_CLIENT_BODY_BUFFER_SIZE=${CLIENT_BODY_BUFFER_SIZE:-1M}
+
+# Create the conf.d directory if it doesn't exist
+if [ ! -d /etc/nginx/conf.d ]; then
+    mkdir -p /etc/nginx/conf.d
+fi
+
 if [ -f /app/nginx.conf ]; then
     cp /app/nginx.conf /etc/nginx/nginx.conf
 else
@@ -54,8 +62,10 @@ else
     # Save generated server /etc/nginx/conf.d/nginx.conf
     printf "$content_server" > /etc/nginx/conf.d/nginx.conf
 
-    # Generate Nginx config for maximum upload file size
+    # # Generate additional configuration
     printf "client_max_body_size $USE_NGINX_MAX_UPLOAD;\n" > /etc/nginx/conf.d/upload.conf
+    printf "client_body_buffer_size $USE_CLIENT_BODY_BUFFER_SIZE;\n" > /etc/nginx/conf.d/body-buffer-size.conf
+    printf "add_header Access-Control-Allow-Origin *;\n" > /etc/nginx/conf.d/cors-header.conf
 fi
 
 exec "$@"

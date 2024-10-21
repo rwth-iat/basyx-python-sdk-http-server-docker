@@ -31,8 +31,8 @@ ENV UWSGI_PROCESSES=1
 ENV NGINX_MAX_UPLOAD=1M
 ENV NGINX_WORKER_PROCESSES=1
 ENV LISTEN_PORT=80
+ENV CLIENT_BODY_BUFFER_SIZE=1M
 
-#simplify this!!!
 # Copy the entrypoint that will generate Nginx additional configs
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -40,7 +40,6 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 COPY ./app /app
-COPY ./nginx /etc/nginx/conf.d
 WORKDIR /app
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.ini"]
