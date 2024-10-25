@@ -1,9 +1,9 @@
 FROM python:3.11-alpine
 
-LABEL org.label-schema.name="Lehrstuhl für Informations- und Automatisierungssyteme der RWTH Aachen" \
+LABEL org.label-schema.name="Eclipse BaSyx" \
       org.label-schema.version="1.0" \
       org.label-schema.description="Docker image for the basyx-python-sdk server application" \
-      org.label-schema.maintainer="IAT"
+      org.label-schema.maintainer="Eclipse BaSyx"
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

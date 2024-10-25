@@ -60,7 +60,7 @@ $ docker run -p 8080:80 -v ./storage2:/storage2 -e API_BASE_PATH=/api/v3.1 -e ST
 ```
 ## Acknowledgments
 
-This project uses code from the [tiangolo/uwsgi-nginx-docker][10] repository. Feel free to check out their project for more information on running uWSGI and Nginx in Docker.
+This Dockerfile is inspired by the [tiangolo/uwsgi-nginx-docker][10] repository.
 
 [1]: https://github.com/eclipse-basyx/basyx-python-sdk/pull/238
 [2]: https://basyx-python-sdk.readthedocs.io/en/latest/backend/local_file.html
