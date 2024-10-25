@@ -57,14 +57,16 @@ services:
       - ./policies:/policies
       - ./opa.yaml:/opa.yaml
 
-  basyxserver:
-    build:
-      dockerfile: Dockerfile
-    container_name: basyx-python-sdk-http-server
+  app:
+    build: .
+    container_name: basyx-python-http-server
     ports:
-      - "8282:80"
+    - 8282:80 
     volumes:
-      - ./storage:/storage
+      - ./storage:/app/storage
+    environment:
+      - STORAGE_PATH=/app/storage
+      - STORAGE_TYPE=LOCAL_FILE_BACKEND
 
           
 

@@ -113,7 +113,7 @@ static_resources:
           - endpoint:
               address:
                 socket_address:
-                  address: basyxserver
+                  address: app
                   port_value: 80
 
 
