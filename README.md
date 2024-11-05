@@ -34,7 +34,6 @@ client_secret = "0MSF64IzBhJ7Rn0pjOdafqVIB8udEQWq"
 username = "aa"
 password = "aa"
 
-<<<<<<< HEAD
 token_response = requests.post(keycloak_url, data={
 'grant_type': 'password',
 'client_id': client_id,
