@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apk update && \
     apk add --no-cache nginx supervisor gcc musl-dev linux-headers python3-dev git bash && \
     pip install uwsgi && \
-    pip install --no-cache-dir git+https://github.com/eclipse-basyx/basyx-python-sdk@main && \
+    pip install --no-cache-dir git+https://github.com/eclipse-basyx/basyx-python-sdk@main#subdirectory=sdk && \
     apk del git bash
 
 
