@@ -1,3 +1,7 @@
+> [!warning]
+> This repository is deprecated!
+> Please use the offical [BaSyx-Python SDK](https://github.com/eclipse-basyx/basyx-python-sdk) server implementation.
+
 # Eclipse BaSyx Python SDK - HTTP Server
 
 This repository contains a Dockerfile to spin up an exemplary HTTP/REST server following the [Specification of the AAS Part 2 API][6] with ease.
